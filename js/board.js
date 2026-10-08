@@ -44,14 +44,12 @@ function renderBoard() {
             var oVuong = document.createElement("div");
             oVuong.className = "cell";
             var val = board[r][c];
-
+            oVuong.dataset.row = r;
+            oVuong.dataset.col = c;
             if(val === 0) {
                 oVuong.className = "cell empty";
             } else {
                 oVuong.innerHTML = '<img src="assets/images/' + val + '.png">';
-                oVuong.dataset.row = r;
-                oVuong.dataset.col = c;
-
                 oVuong.onclick = function() {
                     var rCur = parseInt(this.dataset.row);
                     var cCur = parseInt(this.dataset.col);
@@ -69,13 +67,22 @@ function renderBoard() {
                     else {
                         var rPrev = selectedCell.r;
                         var cPrev = selectedCell.c;
-                        if (board[rPrev][cPrev] === board[rCur][cCur] && canConnect(rPrev, cPrev, rCur, cCur)) {
-                            board[rPrev][cPrev] = 0;
-                            board[rCur][cCur] = 0;
-                            selectedCell = null;
-                            addScore();
-                            renderBoard();
-                        } else {
+                        if (board[rPrev][cPrev] === board[rCur][cCur]) {
+                            var path = getConnect(rPrev, cPrev, rCur, cCur);
+                            if (path !== null) {
+                                drawPath(path, function () {
+                                    board[rPrev][cPrev] = 0;
+                                    board[rCur][cCur] = 0;
+                                    selectedCell = null;
+                                    if (typeof addScore === "function") addScore();
+                                    renderBoard();
+                                    if(checkWin()) {
+                                        showWinModal();
+                                    }
+                                });
+                                return;
+                            }
+                        }
                             selectedCell.element.classList.remove("selected");
                             selectedCell = {
                                 r: rCur,
@@ -83,7 +90,6 @@ function renderBoard() {
                                 element: this };
                             this.classList.add("selected");
                         }
-                    }
                 };
             }
             boardDiv.appendChild(oVuong);
@@ -91,8 +97,43 @@ function renderBoard() {
     }
 }
 
+//Ve duong nối khi pick 2o giong nhau
+function drawPath(path, callback) {
+    var canvas = document.getElementById("canvas");
+    var context = canvas.getContext("2d");
+    var gameScreen = document.getElementById("game-screen");
+    canvas.width = gameScreen.offsetWidth;
+    canvas.height = gameScreen.offsetHeight;
+    context.strokeStyle = "red";
+    context.lineWidth = 3;
+    context.beginPath();
+    for (var i = 0; i < path.length; i++) {
+        var p = path[i];
+        var cell = document.querySelector('.cell[data-row="' + p.r + '"][data-col="' + p.c + '"]');
+        var rect = cell.getBoundingClientRect();
+        var gRect = gameScreen.getBoundingClientRect();
+        var x = rect.left - gRect.left + rect.width / 2;
+        var y = rect.top - gRect.top + rect.height / 2;
 
+        if(i === 0) context.moveTo(x, y);
+        else context.lineTo(x, y);
+    }
+    context.stroke();
+    setTimeout(function () {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        callback();
+    }, 250);
 
+}
+
+function checkWin() {
+    for (var r = 1; r <= 8; r++) {
+        for (var c = 1; c <= 16; c++) {
+            if (board[r][c] !== 0) return false;
+        }
+    }
+    return true;
+}
 
 
 

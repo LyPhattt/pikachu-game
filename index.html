@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Pokemon Match</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 <body>
     <div id="main-menu">
@@ -15,17 +17,81 @@
 
     <div id="game-screen" class="hidden">
         <canvas id="canvas"></canvas>
+
         <div class="header">
-            <button id="btn-back" class="control-btn">Menu</button>
-            <div class="box">Điểm: <span id="score">0</span></div>
-            <div class="box">Thời gian: <span id="timer">180</span>s</div>
-            <button id="btn-shuffle" class="control-btn">Đổi bài</button>
+            <button id="btn-back" class="nut-cam">
+                <i class="fa-solid fa-bars"></i> Menu
+            </button>
+            <div class="chu-thong-tin">
+                Điểm: <b id="score" class="chu-xanh">0</b>
+            </div>
+            <div class="chu-thong-tin">
+                Thời gian: <b id="timer">299</b>s
+            </div>
+            <div class="nhom-nut-icon">
+                <button id="btn-pause" class="nut-cam" title="Tạm dừng">
+                    <i class="fa-solid fa-pause"></i>
+                </button>
+
+                <button id="btn-hint" class="nut-cam" title="Gợi ý">
+                    <i class="fa-solid fa-lightbulb"></i> <span id="hint-count">5</span>
+                </button>
+
+                <button id="btn-shuffle" class="nut-cam" title="Đổi bài">
+                    <i class="fa-solid fa-shuffle"></i> <span id="shuffle-count">5</span>
+                </button>
+            </div>
         </div>
-        <div id="board"></div>
+
+        <div class="main-panel">
+            <div class="panel left-panel">
+                <div class="title-box">Cấp độ</div>
+                <div class="list-level">
+                    <button class="btn-level">Cấp độ 1</button>
+                    <button class="btn-level">Cấp độ 2</button>
+                    <button class="btn-level">Cấp độ 3</button>
+                    <button class="btn-level">Cấp độ 4</button>
+                    <button class="btn-level">Cấp độ 5</button>
+                    <button class="btn-level">Cấp độ 6</button>
+                </div>
+                <div class="note">Chọn cấp độ để bắt đầu nhé!</div>
+            </div>
+            <div class="panel center-panel">
+                <div class="vung-choi">
+                    <div id="board"></div>
+                </div>
+            </div>
+            <div class="panel right-panel">
+                <div class="title-box" id="level-desc-title">Cấp độ 4</div>
+                <div class="description">
+                    <ul>
+                        <li>Nối các ô có cùng hình với nhau để loại bỏ chúng.</li>
+                        <li>Đường nối có thể đi thẳng, hình chữ L hoặc hình chữ Z (tối đa 3 đoạn).</li>
+                        <li>Hoàn thành cấp độ để tiến tới cấp độ tiếp theo!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <div id="win-modal" class="modal hidden">
+        <div class="modal-content">
+            <h1>WIN</h1>
+            <p>Điểm của bạn: <span id="win-score">0</span></p>
+            <button id="btn-next">Tiếp</button>
+        </div>
+    </div>
+
+    <div id="lose-modal" class="modal hidden">
+        <div class="modal-content">
+            <h1>LOSE</h1>
+            <p>Điểm của bạn: <span id="lose-score">0</span></p>
+            <button id="btn-retry">Thử lại</button>
+        </div>
+    </div>
+
+    <script src="js/logic.js"></script>
     <script src="js/board.js"></script>
     <script src="js/game.js"></script>
-    <script src="js/logic.js"></script>
 </body>
 </html>

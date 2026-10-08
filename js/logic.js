@@ -29,7 +29,6 @@ function checkL(r1, c1, r2, c2) {
             return true;
         }
     }
-
 }
 
 function checkZU(r1, c1, r2, c2) {
@@ -50,10 +49,33 @@ function checkZU(r1, c1, r2, c2) {
     return false;
 }
 
-function canConnect(r1, c1, r2, c2) {
-    if (r1 === r2 && c1 === c2) return false;
-    if (checkLine(r1, c1, r2, c2)) return true;
-    if(checkL(c1,r1,c2,r2)) return true;
-    if (checkZU(r1, c1, r2, c2)) return true;
-    return false;
+function getConnect(r1, c1, r2, c2) {
+    if (r1 === r2 && c1 === c2) return null;
+    if (checkLine(r1, c1, r2, c2))
+        return [{r:r1, c:c1}, {r:r2, c:c2}];
+    if(board[r1][c2] === 0 && checkLine(r1, c1, r1, c2) && checkLine(r1, c2, r2, c2)) {
+        return [{r:r1, c:c1}, {r:r1, c:c2}, {r:r2, c:c2}];
+    }
+    if(board[r2][c1] === 0 && checkLine(r1, c1, r2, c1) && checkLine(r2, c1, r2, c2)) {
+        return [{r:r1, c:c1}, {r:r2, c:c1}, {r:r2, c:c2}];
+    }
+    for (var r = 0; r < rows; r++) {
+        if ((board[r][c1] === 0 || r === r1) && (board[r][c2] === 0 || r === r2)) {
+            if(checkLine(r1, c1, r, c1) && checkLine(r, c1, r, c2) && checkLine(r, c2, r2, c2)) {
+                return [{r:r1, c:c1}, {r:r, c:c1}, {r:r, c:c2}, {r:r2, c:c2}];
+            }
+        }
+    }
+    for (var c = 0; c < cols; c++) {
+        if((board[r1][c] === 0 || c === c1) && (board[r2][c] === 0 || c === c2)) {
+            if(checkLine(r1,c1, r1, c) && checkLine(r1, c, r2, c) && checkLine(r2, c, r2, c2)) {
+                return [{r:r1, c:c1}, {r:r1, c:c}, {r:r2, c:c}, {r: r2, c:c2}];
+            }
+        }
+    }
+    return null;
 }
+
+
+
+
