@@ -17,7 +17,6 @@
 
     <div id="game-screen" class="hidden">
         <canvas id="canvas"></canvas>
-
         <div class="header">
             <button id="btn-back" class="nut-cam">
                 <i class="fa-solid fa-bars"></i> Menu
@@ -32,13 +31,8 @@
                 <button id="btn-pause" class="nut-cam" title="Tạm dừng">
                     <i class="fa-solid fa-pause"></i>
                 </button>
-
                 <button id="btn-hint" class="nut-cam" title="Gợi ý">
                     <i class="fa-solid fa-lightbulb"></i> <span id="hint-count">5</span>
-                </button>
-
-                <button id="btn-shuffle" class="nut-cam" title="Đổi bài">
-                    <i class="fa-solid fa-shuffle"></i> <span id="shuffle-count">5</span>
                 </button>
             </div>
         </div>
@@ -62,7 +56,7 @@
                 </div>
             </div>
             <div class="panel right-panel">
-                <div class="title-box" id="level-desc-title">Cấp độ 4</div>
+                <div class="title-box" id="level-desc-title">Cấp độ 1</div>
                 <div class="description">
                     <ul>
                         <li>Nối các ô có cùng hình với nhau để loại bỏ chúng.</li>
@@ -87,6 +81,26 @@
             <h1>LOSE</h1>
             <p>Điểm của bạn: <span id="lose-score">0</span></p>
             <button id="btn-retry">Thử lại</button>
+        </div>
+    </div>
+
+    <div id="pause-modal" class="modal hidden">
+        <div class="modal-card">
+            <div class="pause-header">
+                <h2>TẠM DỪNG</h2>
+            </div>
+            <p class="pause-desc">Trò chơi đang được tạm dừng</p>
+            <div class="pause-menu-list">
+                <button id="btn-resume" class="btn-pause-option btn-resume">
+                    <i class="fa-solid fa-play"></i> Tiếp tục
+                </button>
+                <button id="btn-pause-retry" class="btn-pause-option btn-retry">
+                    <i class="fa-solid fa-rotate-right"></i> Chơi lại
+                </button>
+                <button id="btn-pause-menu" class="btn-pause-option btn-menu">
+                    <i class="fa-solid fa-house"></i> Về Menu
+                </button>
+            </div>
         </div>
     </div>
 

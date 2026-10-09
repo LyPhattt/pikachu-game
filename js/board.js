@@ -51,6 +51,10 @@ function renderBoard() {
             } else {
                 oVuong.innerHTML = '<img src="assets/images/' + val + '.png">';
                 oVuong.onclick = function() {
+                    if(typeof isPaused !== "undefined" && isPaused) return;
+                    if (typeof removeHintEffect === "function") {
+                        removeHintEffect();
+                    }
                     var rCur = parseInt(this.dataset.row);
                     var cCur = parseInt(this.dataset.col);
                     if (selectedCell === null) {
@@ -78,6 +82,11 @@ function renderBoard() {
                                     renderBoard();
                                     if(checkWin()) {
                                         showWinModal();
+                                    } else if(typeof findHint() === "function" && findHint() === null) {
+                                        console.log("Hết đường đi, hệ thống tự động xáo bài");
+                                        setTimeout(function () {
+                                            autoShuffle();
+                                        }, 2000);
                                     }
                                 });
                                 return;
