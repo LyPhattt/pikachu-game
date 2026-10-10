@@ -72,7 +72,7 @@ body {
   background-color: #4b3b82;
   color: #ffffff;
   padding: 8px 25px;
-  border-radius: 12px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,7 +97,7 @@ body {
   color: #333333;
   border: none;
   padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: bold;
   font-size: 13px;
   cursor: pointer;
@@ -124,7 +124,7 @@ body {
   height: fit-content;
   background-color: #4b3b82;
   color: #ffffff;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -238,8 +238,7 @@ body {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   font-family: "Arial Black", sans-serif;
 }
-.modal .modal-content #win-score,
-.modal .modal-content #lose-score {
+.modal .modal-content #win-score, .modal .modal-content #lose-score {
   color: #00ff22;
   font-size: 20px;
   font-weight: bold;
@@ -301,7 +300,6 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  animation: modalBounceIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .pause-header {
@@ -441,6 +439,86 @@ body {
     opacity: 0;
     transform: translate(-50%, -20px);
   }
+}
+#modal-huongDan.modal {
+  background-color: rgba(25, 15, 45, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.card-huongDan {
+  width: 90%;
+  max-width: 580px;
+  background: #4b3b82;
+  border: 4px solid #fba56b;
+  border-radius: 24px;
+  padding: 28px 30px;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.btn-close-x {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  background-color: #fba56b;
+  color: #333333;
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.btn-close-x:hover {
+  background-color: #e89258;
+  transform: scale(1.1);
+}
+.btn-close-x:active {
+  transform: scale(0.95);
+}
+
+.title-huongDan, .title-huongDan {
+  font-size: 26px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 15px;
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+.content-huongDan, .content-huongDan {
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: left;
+  color: #e0d0f5;
+}
+.content-huongDan p, .content-huongDan p {
+  margin: 6px 0;
+}
+.content-huongDan b, .content-huongDan b {
+  color: #ffffff;
+}
+.content-huongDan .section-title, .content-huongDan .section-title {
+  margin-top: 12px;
+  color: #fba56b;
+}
+.content-huongDan ul, .content-huongDan ul {
+  padding-left: 20px;
+  margin: 5px 0;
+}
+.content-huongDan ul li, .content-huongDan ul li {
+  margin-bottom: 4px;
 }
 
 /*# sourceMappingURL=style.css.map */

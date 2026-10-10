@@ -79,6 +79,9 @@ function renderBoard() {
                                     board[rCur][cCur] = 0;
                                     selectedCell = null;
                                     if (typeof addScore === "function") addScore();
+                                    if(typeof currentLevel !== "undefined" && currentLevel === 2) { //level 2 thi don xuong
+                                        shiftDown();
+                                    }
                                     renderBoard();
                                     if(checkWin()) {
                                         showWinModal();

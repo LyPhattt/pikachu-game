@@ -39,7 +39,14 @@ function showWinModal() {
 }
 document.getElementById("btn-next").onclick = function() {
     document.getElementById("win-modal").classList.add("hidden");
-    initGame();
+    if(currentLevel < 6) {
+        currentLevel++;
+        selectLevel(currentLevel);
+        initGame(true);
+    } else {
+        selectLevel(1);
+        initGame(false);
+    }
 };
 
 function showLoseModal() {
@@ -258,9 +265,46 @@ document.querySelectorAll(".btn-level").forEach(function(btn, index) {
     };
 });
 
+//bat tat modal huong dan game
+document.getElementById("btn-huongDan").onclick = function() {
+    document.getElementById("modal-huongDan").classList.remove("hidden");
+};
 
-function initGame() {
-    score = 0;
+const btnCloseHD = document.getElementById("btn-close-huongDan");
+if (btnCloseHD) {
+    btnCloseHD.onclick = function(e) {
+        if(e) e.stopPropagation();
+        document.getElementById("modal-huongDan").classList.add("hidden");
+    };
+}
+
+// Click ra ngoai vung card cung dong modal
+document.getElementById("modal-huongDan").onclick = function(e) {
+    if (e.target === this) {
+        this.classList.add("hidden");
+    }
+};
+
+//level2 don xuong duoi
+function shiftDown() {
+    for (var c = 1; c <= 16; c++) {
+        var emptySlot = 8; //điền tu row 8
+        for (var r = 8; r >= 1; r--) {
+            if(board[r][c] !== 0) {
+                board[emptySlot][c] = board[r][c];
+                if(emptySlot !== r) {
+                    board[r][c] = 0;
+                }
+                emptySlot--;
+            }
+        }
+    }
+}
+
+function initGame(keepScore = false) {
+    if(!keepScore){
+        score = 0;
+    }
     timeLeft = 300; //reset lai time game moi
     isPaused = false;
     hint = 5;
