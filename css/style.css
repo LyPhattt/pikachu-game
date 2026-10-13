@@ -49,7 +49,7 @@ body {
 #game-screen {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(to top right, blueviolet, #b68cd6);
+  background: linear-gradient(to top right, rgb(109, 104, 170), rgb(192, 149, 229));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -180,6 +180,14 @@ body {
   padding: 1px;
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
+  position: relative;
+}
+#game-screen .main-panel .panel.center-panel #board .connect-line {
+  position: absolute;
+  background: red;
+  z-index: 10;
+  pointer-events: none;
+  border-radius: 3px;
 }
 #game-screen .main-panel .panel.center-panel #board .cell {
   width: 40px;
@@ -191,6 +199,13 @@ body {
 }
 #game-screen .main-panel .panel.center-panel #board .cell.empty {
   visibility: hidden;
+}
+#game-screen .main-panel .panel.center-panel #board .cell.rock {
+  background: gray;
+  border: 2px solid #555;
+  border-radius: 5px;
+  font-size: 25px;
+  cursor: default;
 }
 #game-screen .main-panel .panel.center-panel #board .cell img {
   width: 43px;

@@ -37,7 +37,10 @@ const levelsData = {
     },
     3: {
         title: "Cấp độ 3",
-        desc: ["Cấp độ đang cập nhật..."]
+        desc: ["Trên bàn chơi xuất hiện 8 tảng đá cố định.",
+            "Đá không thể chọn, không ghép nối và không di chuyển khi xáo bài.",
+            "Đường nối giữa hai Pokemon không được đi xuyên qua đá, nên người chơi cần tìm đường vòng phù hợp."
+        ]
     },
     4: {
         title: "Cấp độ 4",
@@ -155,21 +158,34 @@ function createBoardData() {
         }
         board.push(rowArray);
     }
-
+    if(currentLevel === 3) {
+        board[3][6] = -1;
+        board[3][11] = -1;
+        board[6][6] = -1;
+        board[6][11] = -1;
+        board[5][5] = -1;
+        board[5][10] = -1;
+        board[4][5] = -1;
+        board[4][10] = -1;
+    }
     const list = [];
-    const tongCap = (8 * 16) / 2;
+    var tongCap = (8 * 16)/2;
+    if(currentLevel === 3) {
+        tongCap = (8 * 16 - 8)/2;
+    }
     for (let i = 0; i < tongCap; i++) {
         const pokemonId = (i % totalImg) + 1;
         list.push(pokemonId);
         list.push(pokemonId);
     }
     list.sort(() => Math.random() - 0.5);
-
     let index = 0;
     for (let r = 1; r <= 8; r++) {
         for (let c = 1; c <= 16; c++) {
-            board[r][c] = list[index];
-            index++;
+            if(board[r][c] === 0) {
+                board[r][c] = list[index];
+                index++;
+            }
         }
     }
 }
@@ -178,7 +194,6 @@ function renderBoard() {
     const boardDiv = document.getElementById("board");
     boardDiv.innerHTML = "";
     boardDiv.style.gridTemplateColumns = "repeat(" + cols + ", 40px)";
-
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             const oVuong = document.createElement("div");
@@ -186,18 +201,18 @@ function renderBoard() {
             const val = board[r][c];
             oVuong.dataset.row = r;
             oVuong.dataset.col = c;
-
-            if (val === 0) {
+            if (val === -1) {
+                oVuong.className = "cell rock";
+                oVuong.innerHTML = "<i class=\"fa-solid fa-mountain\"></i>";
+            } else if (val === 0) {
                 oVuong.className = "cell empty";
             } else {
                 oVuong.innerHTML = '<img src="assets/images/' + val + '.png">';
                 oVuong.onclick = function () {
                     if (isPaused) return;
                     removeHintEffect();
-
                     const rCur = parseInt(this.dataset.row);
                     const cCur = parseInt(this.dataset.col);
-
                     if (selectedCell === null) {
                         selectedCell = {
                             r: rCur,
@@ -211,7 +226,6 @@ function renderBoard() {
                     } else {
                         const rPrev = selectedCell.r;
                         const cPrev = selectedCell.c;
-
                         if (board[rPrev][cPrev] === board[rCur][cCur]) {
                             const path = getConnect(rPrev, cPrev, rCur, cCur);
                             if (path !== null) {
@@ -220,14 +234,10 @@ function renderBoard() {
                                     board[rCur][cCur] = 0;
                                     selectedCell = null;
                                     addScore();
-
-                                    // level 2 thì dồn xuống dưới
                                     if (currentLevel === 2) {
                                         shiftDown();
                                     }
-
                                     renderBoard();
-
                                     if (checkWin()) {
                                         showWinModal();
                                     } else if (findHint() === null) {
@@ -241,7 +251,6 @@ function renderBoard() {
                                 return;
                             }
                         }
-
                         selectedCell.element.classList.remove("selected");
                         selectedCell = {
                             r: rCur,
@@ -257,31 +266,43 @@ function renderBoard() {
     }
 }
 
+function getPoint(row, col) {
+    const cell = document.querySelector('.cell[data-row="' + row + '"][data-col="' + col + '"]');
+    const board = document.getElementById("board");
+    const rect = cell.getBoundingClientRect();
+    const boardRect = board.getBoundingClientRect();
+    return {
+        x: rect.left - boardRect.left + rect.width / 2,
+        y: rect.top - boardRect.top + rect.height / 2
+    };
+}
+
 function drawPath(path, callback) {
-    const canvas = document.getElementById("canvas");
-    const context = canvas.getContext("2d");
-    const gScreen = document.getElementById("game-screen");
-
-    canvas.width = gScreen.offsetWidth;
-    canvas.height = gScreen.offsetHeight;
-    context.strokeStyle = "red";
-    context.lineWidth = 3;
-    context.beginPath();
-
-    for (let i = 0; i < path.length; i++) {
-        const p = path[i];
-        const cell = document.querySelector('.cell[data-row="' + p.r + '"][data-col="' + p.c + '"]');
-        const rect = cell.getBoundingClientRect();
-        const gRect = gScreen.getBoundingClientRect();
-        const x = rect.left - gRect.left + rect.width / 2;
-        const y = rect.top - gRect.top + rect.height / 2;
-
-        if (i === 0) context.moveTo(x, y);
-        else context.lineTo(x, y);
+    const board = document.getElementById("board");
+    for (let i = 0; i < path.length - 1; i++) {
+        const start = getPoint(path[i].r, path[i].c);
+        const end = getPoint(path[i + 1].r, path[i + 1].c);
+        const line = document.createElement("div");
+        line.classList.add("connect-line");
+        if (start.y === end.y) {
+            // connect ngang
+            line.style.left = Math.min(start.x, end.x) + "px";
+            line.style.top = (start.y - 2) + "px";
+            line.style.width = Math.abs(start.x - end.x) + "px";
+            line.style.height = "4px";
+        } else {
+            // connect doc
+            line.style.left = (start.x - 2) + "px";
+            line.style.top = Math.min(start.y, end.y) + "px";
+            line.style.width = "4px";
+            line.style.height = Math.abs(start.y - end.y) + "px";
+        }
+        board.appendChild(line);
     }
-    context.stroke();
     setTimeout(function () {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        document.querySelectorAll(".connect-line").forEach(function (line) {
+            line.remove();
+        });
         callback();
     }, 250);
 }
@@ -289,22 +310,21 @@ function drawPath(path, callback) {
 function checkWin() {
     for (let r = 1; r <= 8; r++) {
         for (let c = 1; c <= 16; c++) {
-            if (board[r][c] !== 0) return false;
+            if (board[r][c] > 0) return false;
         }
     }
     return true;
 }
 
-// 4 tính năng g và level 
-// Tìm 1 cặp Pokemon có thể nối được để gợi ý
+// 4 tính năng g và level
 function findHint() {
     for (let r1 = 1; r1 <= 8; r1++) {
         for (let c1 = 1; c1 <= 16; c1++) {
-            if (board[r1][c1] === 0) continue;
+            if (board[r1][c1] <= 0) continue;
             for (let r2 = 1; r2 <= 8; r2++) {
                 for (let c2 = 1; c2 <= 16; c2++) {
                     if (r1 === r2 && c1 === c2) continue;
-                    if (board[r2][c2] === 0) continue;
+                    if (board[r2][c2] <= 0) continue;
                     if (board[r1][c1] === board[r2][c2]) {
                         const path = getConnect(r1, c1, r2, c2);
                         if (path !== null) {
@@ -355,29 +375,42 @@ function clickHint() {
 function autoShuffle() {
     if (checkWin()) return;
     let hasValidMove = false;
+    let soLanXao = 0;
     do {
         const listConLai = [];
         for (let r = 1; r <= 8; r++) {
             for (let c = 1; c <= 16; c++) {
-                if (board[r][c] !== 0) {
+                if (board[r][c] > 0) {
                     listConLai.push(board[r][c]);
+                    board[r][c] = 0;
                 }
             }
         }
+
         listConLai.sort(() => Math.random() - 0.5);
-        let index = 0;
-        for (let r = 1; r <= 8; r++) {
-            for (let c = 1; c <= 16; c++) {
-                if (board[r][c] !== 0) {
-                    board[r][c] = listConLai[index++];
+        if (listConLai.length === 2) {
+            board[1][1] = listConLai[0];
+            board[1][2] = listConLai[1];
+        } else {
+            const oTrong = [];
+            for (let r = 1; r <= 8; r++) {
+                for (let c = 1; c <= 16; c++) {
+                    if (board[r][c] === 0) {
+                        oTrong.push({ r: r, c: c });
+                    }
                 }
+            }
+            oTrong.sort(() => Math.random() - 0.5);
+            for (let i = 0; i < listConLai.length; i++) {
+                const viTri = oTrong[i];
+                board[viTri.r][viTri.c] = listConLai[i];
             }
         }
         if (findHint() !== null) {
             hasValidMove = true;
         }
-    } while (!hasValidMove);
-
+        soLanXao++;
+    } while (!hasValidMove && soLanXao < 30);
     renderBoard();
 }
 
@@ -405,7 +438,6 @@ function shiftDown() {
         }
     }
 }
-
 // 5 Luồng g và UI
 function toggleScreens() {
     menuScreen.classList.toggle("hidden");

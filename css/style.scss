@@ -52,7 +52,7 @@ body {
 #game-screen {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(to top right, blueviolet, #b68cd6);
+  background: linear-gradient(to top right, rgba(109, 104, 170), rgba(192,149,229));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -198,7 +198,14 @@ body {
           padding: 1px;
           background-color: rgba(0, 0, 0, 0.1);
           border-radius: 10px;
-
+          position: relative;
+          .connect-line {
+            position: absolute;
+            background: red;
+            z-index: 10;
+            pointer-events: none;
+            border-radius: 3px;
+          }
           .cell {
             width: 40px;
             height: 44px;
@@ -209,7 +216,13 @@ body {
 
             &.empty {
               visibility: hidden;
-
+            }
+            &.rock {
+              background: gray;
+              border: 2px solid #555;
+              border-radius: 5px;
+              font-size: 25px;
+              cursor: default;
             }
 
             img {
