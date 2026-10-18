@@ -1,23 +1,9 @@
-// 1 Cài đặt g và trạng thái 
+// 1 Cài đặt g và trạng thái
+const menuScreen = document.getElementById("main-menu");
+const gameScreen = document.getElementById("game-screen");
 const rows = 10;
 const cols = 18;
 const totalImg = 19;
-
-let board = [];
-let selectedCell = null;
-let score = 0;
-let timeLeft = 300;
-let timer = null;
-let isPaused = false;
-let hint = 5;
-let hintTimeout = null;
-let currentLevel = 1;
-
-// DOM Elements chính
-const menuScreen = document.getElementById("main-menu");
-const gameScreen = document.getElementById("game-screen");
-
-// descrip level
 const levelsData = {
     1: {
         title: "Cấp độ 1",
@@ -44,7 +30,9 @@ const levelsData = {
     },
     4: {
         title: "Cấp độ 4",
-        desc: ["Cấp độ đang cập nhật..."]
+        desc: ["Trên bàn chơi xuất hiện 8 ô băng ngẫu nhiên.",
+            "Ô băng không thể chọn và chặn các đường nối đi xuyên qua.",
+            "Người chơi cần ăn các ô (trên, dưới, trái, phải) của ô băng đó để phá băng."]
     },
     5: {
         title: "Cấp độ 5",
@@ -149,8 +137,27 @@ function getConnect(r1, c1, r2, c2) {
 }
 
 // 3 Board và ve ui
+var board = [];
+var selectedCell = null;
+var currentLevel = 1;
+var oBang = [];
+
+function isBang(r,c) {
+    for(var i = 0; i < oBang.length; i++) {
+        if(oBang[i].r === r && oBang[i].c === c) {
+            return true;
+        }
+    }
+    return false;
+}
+function phaBang(r, c) {
+    oBang = oBang.filter(function(ice) {
+        return Math.abs(ice.r - r) + Math.abs(ice.c - c) !== 1;
+    })
+}
 function createBoardData() {
     board = [];
+    oBang = [];
     for (let i = 0; i < rows; i++) {
         const rowArray = [];
         for (let j = 0; j < cols; j++) {
@@ -167,6 +174,21 @@ function createBoardData() {
         board[5][10] = -1;
         board[4][5] = -1;
         board[4][10] = -1;
+    }
+    if(currentLevel === 4) {
+        while(oBang.length < 8) {
+            const r = Math.floor(Math.random() * 8) + 1;
+            const c = Math.floor(Math.random() * 16) + 1;
+            var isDuplicate = false;
+            for(var i = 0; i<oBang.length;i++) {
+                if(oBang[i].r === r && oBang[i].c === c) {
+                    isDuplicate = true;
+                }
+            }
+            if(isDuplicate === false) {
+                oBang.push({r: r, c: c});
+            }
+        }
     }
     const list = [];
     var tongCap = (8 * 16)/2;
@@ -208,11 +230,16 @@ function renderBoard() {
                 oVuong.className = "cell empty";
             } else {
                 oVuong.innerHTML = '<img src="assets/images/' + val + '.png">';
+                if(isBang(r,c)) {
+                    oVuong.classList.add("bang");
+                    oVuong.innerHTML = "<i class='fa-solid fa-snowflake ice-icon'></i>"
+                }
                 oVuong.onclick = function () {
                     if (isPaused) return;
                     removeHintEffect();
                     const rCur = parseInt(this.dataset.row);
                     const cCur = parseInt(this.dataset.col);
+                    if(isBang(rCur, cCur)) return;
                     if (selectedCell === null) {
                         selectedCell = {
                             r: rCur,
@@ -236,6 +263,10 @@ function renderBoard() {
                                     addScore();
                                     if (currentLevel === 2) {
                                         shiftDown();
+                                    }
+                                    if(currentLevel === 4) {
+                                        phaBang(rPrev, cPrev);
+                                        phaBang(rCur, cCur);
                                     }
                                     renderBoard();
                                     if (checkWin()) {
@@ -279,7 +310,7 @@ function getPoint(row, col) {
 
 function drawPath(path, callback) {
     const board = document.getElementById("board");
-    for (let i = 0; i < path.length - 1; i++) {
+    for (var i = 0; i < path.length - 1; i++) {
         const start = getPoint(path[i].r, path[i].c);
         const end = getPoint(path[i + 1].r, path[i + 1].c);
         const line = document.createElement("div");
@@ -317,6 +348,9 @@ function checkWin() {
 }
 
 // 4 tính năng g và level
+var hint = 5;
+var hintTimeout = null;
+
 function findHint() {
     for (let r1 = 1; r1 <= 8; r1++) {
         for (let c1 = 1; c1 <= 16; c1++) {
@@ -439,6 +473,11 @@ function shiftDown() {
     }
 }
 // 5 Luồng g và UI
+var score = 0;
+var timeLeft = 300;
+var timer = null;
+var isPaused = false;
+
 function toggleScreens() {
     menuScreen.classList.toggle("hidden");
     gameScreen.classList.toggle("hidden");

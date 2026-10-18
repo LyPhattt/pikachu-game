@@ -224,6 +224,17 @@ body {
               font-size: 25px;
               cursor: default;
             }
+            &.bang {
+              position: relative;
+              background: deepskyblue;
+              border: 2px solid white;
+            }
+
+            .ice-icon {
+              position: absolute;
+              color: white;
+              font-size: 22px;
+            }
 
             img {
               width: 43px;

@@ -207,6 +207,16 @@ body {
   font-size: 25px;
   cursor: default;
 }
+#game-screen .main-panel .panel.center-panel #board .cell.bang {
+  position: relative;
+  background: deepskyblue;
+  border: 2px solid white;
+}
+#game-screen .main-panel .panel.center-panel #board .cell .ice-icon {
+  position: absolute;
+  color: white;
+  font-size: 22px;
+}
 #game-screen .main-panel .panel.center-panel #board .cell img {
   width: 43px;
   height: 44px;
