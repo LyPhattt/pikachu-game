@@ -43,7 +43,9 @@ const levelsData = {
     },
     6: {
         title: "Cấp độ 6",
-        desc: ["Cấp độ đang cập nhật..."]
+        desc: ["Các Pokémon ở vòng ngoài sẽ tự động xoay theo chiều kim đồng hồ mỗi 3s.",
+            "Các Pokémon ở khu vực giữa sẽ giữ nguyên vị trí.",
+            "Quan sát vòng xoay và canh đúng thời điểm để ghép các Pokémon giống nhau."]
     }
 };
 
@@ -346,7 +348,7 @@ function renderBoard() {
                                     renderBoard();
                                     if (checkWin()) {
                                         showWinModal();
-                                    } else if (findHint() === null) {
+                                    } else if (findHint() === null && currentLevel !== 6) {
                                         console.log("Hết đường đi, hệ thống tự động xáo bài");
                                         showAutoShuffleNotice();
                                         setTimeout(function () {
@@ -549,11 +551,60 @@ function shiftDown() {
         }
     }
 }
+
+function getDanhSachOVien() {
+    var dsOVien = [];
+    for (var c = 1; c <= 16; c++) {
+        dsOVien.push({r:1,c:c});
+    }
+    for (var r = 2; r <= 8; r++) {
+        dsOVien.push({r:r,c:16});
+    }
+    for (var c = 15; c >= 1; c--) {
+        dsOVien.push({r:8,c:c});
+    }
+    for (var r = 7; r >= 2; r--) {
+        dsOVien.push({r:r,c:1});
+    }
+    return dsOVien;
+}
+
+function rotationVienNgoai(){
+    if(currentLevel !== 6 || isPaused || checkWin()) return;
+    var dsVien = getDanhSachOVien();
+    var val = [];
+    for (var i = 0; i < dsVien.length; i++) {
+        val.push(board[dsVien[i].r][dsVien[i].c]);
+    }
+    for (var i = 0; i < dsVien.length; i++) {
+        var nextIndex = (i+1) % dsVien.length;
+        board[dsVien[nextIndex].r][dsVien[nextIndex].c] = val[i];
+    }
+    selectedCell = null;
+    removeHintEffect();
+    renderBoard();
+}
+
+function stopRotation() {
+    clearInterval(rotationTimer);
+    rotationTimer = null;
+}
+
+function startRotation() {
+    stopRotation();
+    if(currentLevel !== 6) return;
+    rotationTimer = setInterval(function () {
+        rotationVienNgoai()
+    }, 3000);
+}
+
+
 // 5 Luồng g và UI
 var score = 0;
 var timeLeft = 300;
 var timer = null;
 var isPaused = false;
+var rotationTimer = null;
 
 function toggleScreens() {
     menuScreen.classList.toggle("hidden");
@@ -579,12 +630,14 @@ function addScore() {
 
 function showWinModal() {
     clearInterval(timer);
+    stopRotation();
     document.getElementById("win-score").innerText = score;
     document.getElementById("win-modal").classList.remove("hidden");
 }
 
 function showLoseModal() {
     clearInterval(timer);
+    stopRotation();
     document.getElementById("lose-score").innerText = score;
     document.getElementById("lose-modal").classList.remove("hidden");
 }
@@ -593,6 +646,7 @@ function pauseGame() {
     if (isPaused) return;
     isPaused = true;
     clearInterval(timer);
+    stopRotation();
     document.getElementById("pause-modal").classList.remove("hidden");
 }
 
@@ -601,6 +655,7 @@ function resumeGame() {
     isPaused = false;
     document.getElementById("pause-modal").classList.add("hidden");
     startTimer();
+    startRotation();
 }
 
 // select và update hiển thị level
@@ -648,9 +703,11 @@ function initGame(keepScore = false) {
     document.getElementById("btn-hint").classList.remove("disabled");
 
     clearFlipTimers();
+    stopRotation();
     createBoardData();
     renderBoard();
     startTimer();
+    startRotation();
 }
 
 
@@ -663,6 +720,7 @@ document.getElementById("btn-start").onclick = () => {
 
 document.getElementById("btn-back").onclick = () => {
     clearInterval(timer);
+    stopRotation();
     toggleScreens();
 };
 
@@ -702,6 +760,7 @@ document.getElementById("btn-pause-menu").onclick = function () {
     document.getElementById("pause-modal").classList.add("hidden");
     isPaused = false;
     clearInterval(timer);
+    stopRotation();
     toggleScreens();
 };
 
