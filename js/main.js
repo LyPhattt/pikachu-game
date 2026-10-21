@@ -36,7 +36,10 @@ const levelsData = {
     },
     5: {
         title: "Cấp độ 5",
-        desc: ["Cấp độ đang cập nhật..."]
+        desc: ["Trên bàn chơi xuất hiện 12 ô ngẫu nhiên.",
+            "Nhấn vào ô ? để lật xem Pokemon bên dưới.",
+            "Sau 2s, ô sẽ tự động úp lại nếu chưa được ghép cặp.",
+            "Ăn một cặp bằng cách nối 1 ô với ô đã lật lên."]
     },
     6: {
         title: "Cấp độ 6",
@@ -104,12 +107,12 @@ function checkZU(r1, c1, r2, c2) {
 function getConnect(r1, c1, r2, c2) {
     if (r1 === r2 && c1 === c2) return null;
 
-    // Đường thẳng (1 đoạn)
+    // Đường thẳng
     if (checkLine(r1, c1, r2, c2)) {
         return [{ r: r1, c: c1 }, { r: r2, c: c2 }];
     }
 
-    // Đường chữ L (2 đoạn)
+    //  Đường chữ L
     if (board[r1][c2] === 0 && checkLine(r1, c1, r1, c2) && checkLine(r1, c2, r2, c2)) {
         return [{ r: r1, c: c1 }, { r: r1, c: c2 }, { r: r2, c: c2 }];
     }
@@ -117,7 +120,7 @@ function getConnect(r1, c1, r2, c2) {
         return [{ r: r1, c: c1 }, { r: r2, c: c1 }, { r: r2, c: c2 }];
     }
 
-    // Đường chữ Z / U (3 đoạn)
+    //  Đường chữ Z/U
     for (let r = 0; r < rows; r++) {
         if ((board[r][c1] === 0 || r === r1) && (board[r][c2] === 0 || r === r2)) {
             if (checkLine(r1, c1, r, c1) && checkLine(r, c1, r, c2) && checkLine(r, c2, r2, c2)) {
@@ -141,6 +144,8 @@ var board = [];
 var selectedCell = null;
 var currentLevel = 1;
 var oBang = [];
+var oAn = [];
+var flipTimers = {};
 
 function isBang(r,c) {
     for(var i = 0; i < oBang.length; i++) {
@@ -155,9 +160,52 @@ function phaBang(r, c) {
         return Math.abs(ice.r - r) + Math.abs(ice.c - c) !== 1;
     })
 }
+
+function isAn(r,c) {
+    for(var i = 0; i < oAn.length; i++) {
+        if(oAn[i].r === r && oAn[i].c === c && !oAn[i].isFlipped) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function latOAn(r,c) {
+    for(var i = 0; i < oAn.length; i++) {
+        if(oAn[i].r === r && oAn[i].c === c) {
+            oAn[i].isFlipped = true;
+            var key = getFlipKey(r,c);
+            if(flipTimers[key]) {
+                clearTimeout(flipTimers[key]);
+            }
+            flipTimers[key] = setTimeout(function() {
+                oAn[i].isFlipped = false;
+                delete flipTimers[key];
+                if(selectedCell !== null && selectedCell.r === r && selectedCell.c === c) {
+                    selectedCell = null;
+                }
+                renderBoard();
+            }, 2000);
+            break;
+        }
+    }
+}
+
+function getFlipKey(r, c) {
+    return r + "-" + c;
+}
+
+function clearFlipTimers() {
+    for (var key in flipTimers) {
+        clearTimeout(flipTimers[key]);
+    }
+    flipTimers = {};
+}
+
 function createBoardData() {
     board = [];
     oBang = [];
+    oAn = [];
     for (let i = 0; i < rows; i++) {
         const rowArray = [];
         for (let j = 0; j < cols; j++) {
@@ -210,6 +258,24 @@ function createBoardData() {
             }
         }
     }
+    if(currentLevel === 5) {
+        while(oAn.length < 12) {
+            const r = Math.floor(Math.random() * 8) + 1;
+            const c = Math.floor(Math.random() * 16) + 1;
+            if(board[r][c] > 0) {
+                var daAn = false;
+                for (var i = 0; i<oAn.length;i++) {
+                    if(oAn[i].r === r && oAn[i].c === c) {
+                        daAn = true;
+                        break;
+                    }
+                }
+                if(!daAn) {
+                    oAn.push({r, c, isFlipped: false});
+                }
+            }
+        }
+    }
 }
 
 function renderBoard() {
@@ -234,12 +300,21 @@ function renderBoard() {
                     oVuong.classList.add("bang");
                     oVuong.innerHTML = "<i class='fa-solid fa-snowflake ice-icon'></i>"
                 }
+                if(isAn(r,c)) {
+                    oVuong.classList.add("o-up");
+                    oVuong.innerHTML = "?";
+                }
                 oVuong.onclick = function () {
                     if (isPaused) return;
                     removeHintEffect();
                     const rCur = parseInt(this.dataset.row);
                     const cCur = parseInt(this.dataset.col);
                     if(isBang(rCur, cCur)) return;
+                    if (isAn(rCur, cCur)) {
+                        latOAn(rCur, cCur);
+                        renderBoard();
+                        return;
+                    }
                     if (selectedCell === null) {
                         selectedCell = {
                             r: rCur,
@@ -351,14 +426,16 @@ function checkWin() {
 var hint = 5;
 var hintTimeout = null;
 
-function findHint() {
+function findHint(hidden = true) {
     for (let r1 = 1; r1 <= 8; r1++) {
         for (let c1 = 1; c1 <= 16; c1++) {
             if (board[r1][c1] <= 0) continue;
+            if(!hidden && isAn(r1,c1)) continue;
             for (let r2 = 1; r2 <= 8; r2++) {
                 for (let c2 = 1; c2 <= 16; c2++) {
                     if (r1 === r2 && c1 === c2) continue;
                     if (board[r2][c2] <= 0) continue;
+                    if(!hidden && isAn(r2,c2)) continue;
                     if (board[r1][c1] === board[r2][c2]) {
                         const path = getConnect(r1, c1, r2, c2);
                         if (path !== null) {
@@ -384,7 +461,7 @@ function clickHint() {
         alert("Bạn đã hết lượt!");
         return;
     }
-    const hintPair = findHint();
+    const hintPair = findHint(false);
     if (hintPair) {
         hint--;
         document.getElementById("hint-count").innerText = hint;
@@ -570,6 +647,7 @@ function initGame(keepScore = false) {
     document.getElementById("hint-count").innerText = hint;
     document.getElementById("btn-hint").classList.remove("disabled");
 
+    clearFlipTimers();
     createBoardData();
     renderBoard();
     startTimer();
