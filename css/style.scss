@@ -62,16 +62,6 @@ body {
   font-family: Arial, sans-serif;
   overflow: hidden;
 
-  #canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 99;
-  }
-
   .header {
     background-color: #4b3b82;
     color: #ffffff;
@@ -197,7 +187,7 @@ body {
           gap: 2px;
           padding: 1px;
           background-color: rgba(0, 0, 0, 0.1);
-          border-radius: 10px;
+          border-radius: 7px;
           position: relative;
           .connect-line {
             position: absolute;
@@ -295,7 +285,7 @@ body {
     height: 220px;
     background: #4b3b82;
     border: 4px solid #fba56b;
-    border-radius: 10px;
+    border-radius: 7px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -319,10 +309,6 @@ body {
       padding-top: 20px;
       line-height: 1;
       -webkit-text-stroke: 2px white;
-      text-shadow: 1px 1px 0 white,
-        -1px -1px 0 white,
-        1px -1px 0 white,
-        -1px 1px 0 white;
     }
 
     p {
@@ -369,7 +355,7 @@ body {
   padding: 28px 22px;
   background: #4b3b82;
   border: 2px solid #fba56b;
-  border-radius: 10px;
+  border-radius: 7px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -449,25 +435,9 @@ body {
   color: #ffffff;
 }
 
-.btn-pause-option.btn-menu:hover {  
+.btn-pause-option.btn-menu:hover {
   background-color: #c0392b;
   transform: translateY(-2px);
-}
-
-@keyframes modalBounceIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-
-  70% {
-    transform: scale(1.05);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 .cell.hint-active {
@@ -492,34 +462,9 @@ body {
   background-color: #ffbe76;
   color: black;
   padding: 10px 20px;
-  border-radius: 20px;
+  border-radius: 7px;
   font-weight: 600;
   font-size: 17px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  z-index: 9999;
-  animation: fadeInOut 2s ease forwards;
-}
-
-@keyframes fadeInOut {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -20px);
-  }
-
-  15% {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-
-  85% {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -20px);
-  }
 }
 
 #modal-huongDan.modal {
@@ -560,18 +505,15 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-
   &:hover {
     background-color: #e89258;
     transform: scale(1.1);
   }
-
   &:active {
     transform: scale(0.95);
   }
 }
-
-.title-huongDan, .title-huongDan {
+.title-huongDan {
   font-size: 26px;
   font-weight: bold;
   color: #ffffff;
@@ -580,26 +522,21 @@ body {
   padding-bottom: 10px;
   text-align: center;
 }
-
-.content-huongDan, .content-huongDan {
+.content-huongDan {
   font-size: 15px;
   line-height: 1.6;
   text-align: left;
   color: #e0d0f5;
-
   p {
     margin: 6px 0;
   }
-
   b {
     color: #ffffff;
   }
-
   .section-title {
     margin-top: 12px;
     color: #fba56b;
   }
-
   ul {
     padding-left: 20px;
     margin: 5px 0;
